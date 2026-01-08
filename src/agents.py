@@ -16,7 +16,7 @@ class Agents:
                  dataset_name:str,
                  api_key:str,
                  api_org: str,
-                 model: str="gpt-4",
+                 model: str="gpt-4o",
                  temperature: int = 1.0,
                  config_path: str = config_path):
         self.dataset_name = dataset_name

@@ -1,7 +1,8 @@
 # Main Agent framework
-crewai>=0.28.0
+crewai>=0.30.0
 langchain-openai>=0.1.0
 
+crewai-tools
 # Data analysis
 pandas>=2.0.0
 numpy>=1.24.0

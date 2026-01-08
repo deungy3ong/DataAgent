@@ -1,5 +1,12 @@
 # Custom Tools
 from crewai.tools import BaseTool
+import io
+import os
+import yaml
+from contextlib import redirect_stdout
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(current_dir, "plot_fig.yaml")
 
 class PythonREPLTool(BaseTool):
     """
@@ -36,15 +43,68 @@ class PythonREPLTool(BaseTool):
                 "np": np, 
                 "plt": plt, 
                 "sns": sns, 
-                "sqlite3": sqlite3
+                "sqlite3": sqlite3,
+                "stats": stats
             }
-            #exec_globals = { "matplotlib": matplotlib, "scipy": scipy, "pandas": pandas, "pd": pd, "np": np, "sns": sns, "plt": plt, "pearsonr":pearsonr} 
-            exec(code, globals(), local_scope)  # Execute the code
-            result = local_scope.get('result', 'Execution completed.')
-            if len(result) > 2000: # Output truncated due to context limits
+            stdout_buffer = io.StringIO()
+            with redirect_stdout(stdout_buffer):
+                exec(code, globals(), local_scope)
+            printed_output = stdout_buffer.getvalue().strip()
+            result = local_scope.get('result', printed_output)
+            
+            if not result:
+                result = "Execution completed."
+            result = str(result)
+            # #exec_globals = { "matplotlib": matplotlib, "scipy": scipy, "pandas": pandas, "pd": pd, "np": np, "sns": sns, "plt": plt, "pearsonr":pearsonr} 
+            # # Execute the code
+            # exec(code, globals(), local_scope)  
+            # result = local_scope.get('result', 'Execution completed.')
+            # # Output truncated due to context limits
+            if len(result) > 2000: 
                 return result[:2000] + "\n[Output truncated due to context limits...]"
             return result
             # return str(local_scope.get('result', 'Execution completed.'))
         
         except Exception as e:
             return f"Error executing code: {str(e)}"
+        
+class StyleConfigTool(BaseTool):
+    """
+    Custom tool to get plot arguments configuration.
+    """
+    name: str = "StyleConfig"
+    description: str = (
+        "Get corresponding plot parameters configuration from plot_fig.yaml."
+        "Input should be one of: 'line', 'bar', 'scatter', 'heatmap', or 'general' (for figsize/dpi). "
+        "Returns a dictionary of parameters to be used in matplotlib/seaborn functions."
+    )
+    
+    def _run(self, 
+             plot_type: str,
+             config_path:str = config_path) -> str:
+        """
+        Get corresponding plot parameters configuration from plot_fig.yaml.
+        
+        Args:
+        plot_type (str): plot type.
+
+        Returns:
+        str: Returns a dictionary of parameters to be used in matplotlib/seaborn functions.
+        """
+        try:
+            with open(config_path, 'r', encoding='utf-8') as file:
+                config = yaml.safe_load(file)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Plot configuration file not found: {config_path}") from e
+        
+        styles = config.get("company_style", {})
+        
+        if plot_type in ['line', 'bar', 'scatter', 'heatmap']:
+            basic = styles.get("plot_types", {}).get("basic")
+            params = styles.get("plot_types", {}).get(plot_type, {})
+            
+            
+            return str({"basic": basic, "params": params})
+        
+        else:
+            return f"Error: Unknown chart type '{plot_type}'. Available: line, bar, scatter, heatmap."

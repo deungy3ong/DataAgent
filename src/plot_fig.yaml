@@ -1,0 +1,71 @@
+company_style:
+  basic:
+    general:
+      dpi: 300                     
+      figure_size: [12, 7]       
+      background_color: "#FFFFFF"  
+      face_color: "#F8F9FA"       
+      font_family: "sans-serif"    
+      font_scale: 1.2              
+      context: "notebook"          
+
+    palette:
+      primary: 
+        - "#2E4053" # Deep Charcoal
+        - "#E74C3C" # Accent Red
+        - "#3498DB" # Bright Blue
+        - "#F1C40F" # Yellow
+        - "#27AE60" # Green
+        - "#8E44AD" # Purple
+      
+      # Continuous gradient color (for heatmap)
+      continuous: "viridis"       
+      
+      # Diverging colors (for positive and negative contrast)
+      diverging: "vlag"
+
+    # === (Axes & Grid) ===
+    axes:
+      titlesize: 18                
+      titleweight: "bold"        
+      labelsize: 14              
+      labelcolor: "#333333"       
+      spines_top: false           
+      spines_right: false         
+      grid: true                   
+      grid_style: "--"             
+      grid_alpha: 0.6             
+      grid_color: "#E0E0E0"       
+
+    # === (Legend) ===
+    legend:
+      fontsize: 12
+      title_fontsize: 13
+      frameon: false               
+      loc: "best"                  
+
+  # === (Specific Plot Params) ===
+  plot_types:
+    line:
+      linewidth: 3.0
+      marker: "o"
+      markersize: 8
+      markeredgecolor: "white"   
+    
+    bar:
+      edgecolor: "white"         
+      linewidth: 0.5
+      alpha: 0.85                
+    
+    scatter:
+      s: 100                  
+      alpha: 0.7
+      edgecolor: "white"
+      linewidth: 0.5
+    
+    heatmap:
+      annot: true                
+      fmt: ".2f"               
+      square: true               
+      linewidths: 0.5            
+      cbar: true                 
