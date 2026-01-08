@@ -1,0 +1,30 @@
+analysis_task:
+  description: >
+    1. Load and Preprocess the dataset at {dataset_path}. using Python"
+    2. Analyze the data based on user query: {user_query}.
+    3. OUTPUT REQUIREMENT: You must provide a structured output divided into two sections:
+      - SECTION A: Statistical Insights & Business Logic (metrics, correlations, outliers).
+      - SECTION B: Plotting Instructions (Suggest 2-3 key plots and provide the aggregated numbers for them).
+  expected_output: >
+    A concise and structured text summary with Section A (Stats) and Section B (Data for Plots), max 500 words.
+
+visualization_task:
+  description: >
+    1. Read the 'SECTION B: Plotting Instructions' from the Analyst's output.
+    2. Generate Python code to create these plots using Matplotlib/Seaborn.
+    3. Analyze the generated charts to identify visual trends (spikes, drops, patterns).
+    4. MANDATORILY save these generated plots under the folder {output_path} using plt.savefig() and DO NOT use plt.show()
+  expected_output: >
+    A structured list of the saved image files using relative paths,
+    formatted exactly like this: 'IMAGE_PATH: images/filename.png'.
+    Followed by a brief description of the trends in each plot.
+
+report_task:
+  description: >
+    1. Review the Statistical Insights from the Analyst (Task 1).
+    2. Review the Image Paths and Visual Trends from the Visualizer (Task 2).
+    3. Synthesize these into a cohesive Markdown report.
+    4. Embed images using the relative paths provided.
+    5. Save the final file as {dataset_name}.md in the {output_path}.
+  expected_output: >
+    A professional Markdown report saved to the disk, confirming the file path.
