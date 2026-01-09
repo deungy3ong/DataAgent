@@ -1,36 +1,58 @@
 analysis_task:
-  description: >
-    1. Load the dataset at {dataset_path} and perform mandatory preprocessing (cleaning, type conversion).
-    2. Analyze the data based on the user query: "{user_query}".
-    3. **Memory Check:** If this is a revised run, review previous feedback and adjust the analysis focus accordingly.
-    4. OUTPUT REQUIREMENT: Provide a structured summary for the Manager containing:
-       - SECTION A: Key Statistical Insights (Logic, Metrics, KPIs).
-       - SECTION B: Plotting Data (Aggregated numbers and suggestions for 2-3 plots).
+  description: > 
+    **DataSource** {dataset_path} 
+    **Context:** User Query: "{user_query}". Previous Context: {context}
+    
+    **Action Required:**
+    1. **Understand & Preprocess:** Review the user's query and history. If this is the first interaction or the data hasn't been cleaned, use Python to check for duplicates and handle missing values (fillna/dropna) as appropriate for the analysis.
+    2. **Execute Analysis:** Use `PythonREPLTool` to run code that directly answers the query.
+    3. **Result Synthesis**: Once you get the output from PythonREPLTool, you MUST interpret the result and provide a direct answer to the user in natural language. Do not stop after generating or executing the code. Your thought process must end with a clear statement of the final fact (e.g., "There are X tables in the database.").
+    4. **Data Constraint:** If the user asks for data rows but doesn't specify how many, DEFAULT to displaying only the **top 5 rows** (`df.head(5)`).
+    
+    **Goal:** Provide a concise, accurate answer derived strictly from code execution.
   expected_output: >
-    A structured technical summary with Section A (Stats) and Section B (Plot Data), ready for the Manager to review and the Visualizer to use.
+    A final, human-readable concise answer that directly addresses the user's query based on the tool's output. Format: [Direct Answer] + [Brief Explanation/Data Snippet]. Example: "The Chinook database contains 11 tables. Here is the list: ..."
+    If data frames are returned, they must be truncated to 5 rows unless requested otherwise.
 
 visualization_task:
-  description: >
-    1. Review 'SECTION B' from the Analyst's output to understand the data structure.
-    2. **Style Retrieval (Mandatory):** Identify the type of chart needed (e.g., 'line', 'bar'). 
-       **Call the `StyleConfigTool`** with this chart type to get the dictionary of styling parameters (palette, figure_size, spines, etc.).
-    3. **Code Generation:** Generate Python code to create the plots. 
-       **Constraint:** You must unpack/inject the parameters retrieved from Step 2 into your plotting functions (e.g., `sns.barplot(..., **retrieved_params)`). 
-       Do NOT hardcode colors unless explicitly overriding for a specific insight.
-    4. **Save Images:** Save plots strictly to `{result_path}/{dataset_name}/images/`.
-    5. **Memory Check:** If previous feedback mentioned style issues, ensure you are correctly applying the tool's output this time.
+  description: > 
+    **DataSource** {dataset_path}
+    **Context:** User Query: "{user_query}". Previous Context: {context}
+
+    **Action Required:**
+    1. **Goal Identification:** Identify the visualization goal. Review the context to see if data preprocessing (e.g., aggregation, cleaning) was already done or needs to be done now using `PythonREPLTool`.
+    2. **Style Extraction (Mandatory):** Identify the chart type (e.g., 'bar', 'line'). Call `StyleConfigTool` to extract the required styling parameters (palette, figure size, spines).
+    3. **Plotting & Saving:** - Generate the plot using Python (Matplotlib/Seaborn).
+       - Apply the extracted styles (inject parameters).
+       - Give the file a meaningful name (e.g., `sales_trend_q1.png`).
+       - **CRITICAL:** Do NOT use `plt.show()`. Use `plt.savefig()` to save the file strictly to `{result_path}/{dataset_name}/images/`.
+    4. **Execute & Save**: Use PythonREPLTool to execute the generated code. 
+    5. **Confirmation**: After executing the code, you MUST verify that the file was successfully created. Do not simply provide the code and stop. You must wait for the tool to confirm the execution was successful.
+    6. **Insight Extraction:** Analyze the generated plot to extract key insights.
+    7. **Final Verification**: Before submitting your answer, you must run a final Python snippet to list the files in `{result_path}/{dataset_name}/images/` to confirm your plots are there. Include this confirmation in your thought process.
   expected_output: >
-    A list of relative paths for the saved images (formatted: 'IMAGE_PATH: images/filename.png') 
-    where every image strictly adheres to the company style retrieved from the tool.
-    Accompanied by a short visual trend analysis for each plot.
+    A Python Dictionary where:
+    - Keys are the **relative file paths** of the saved images (e.g., "images/filename.png").
+    - Values are the **textual insights** derived from that specific plot.
+    Important: If no images are saved, the task is considered FAILED.
 
 report_task:
-  description: >
-    1. Act as the final consolidator. Gather all "Statistical Insights" from the Analysis Task, the "Image Paths" from the Visualization Task and conversation history.
-    2. Synthesize a professional Data Analysis Report in Markdown format.
-    3. **Embed Images:** Use the relative paths provided (e.g., `![Trend](images/plot.png)`).
-    4. **User Alignment:** Ensure the tone and content directly answer: "{user_query}".
-    5. Save the final report file as `{dataset_name}.md` in `{result_path}/{dataset_name}/`.
+  description: >   
+    **DataSource** {dataset_path}
+    **Context:** Final User Query: "{user_query}". Full Conversation History: {context}
+
+    **Action Required:**
+    1. **Review History:** Read through the entire conversation history provided in the context. Identify key findings from `simp_analysis_task` and image paths/insights from `comp_analysis_task`.
+    2. **Synthesize Report:** Create a professional, "Image-and-Text" Markdown report.
+    3. **Structure:**
+       - **Executive Summary:** Brief overview of the analysis.
+       - **Data Insights:** Detailed findings from the analysis phase.
+       - **Visualizations:** Embed the images using the relative paths found in the history (Format: `![Insight Description](images/filename.png)`).
+       - **Conclusion:** Final thoughts.
+    4. **Save:** Save the content to a file named `{dataset_name}.md` in `./results/{dataset_name}/`.
+       **Do NOT write any Python code to save the file.** The system will handle the saving.
+    5. **Final Verification**: Before submitting your answer, you must run a final Python snippet to list the files in `./results/{dataset_name}/` to confirm your plots are there. Include this confirmation in your thought process.
   expected_output: >
-    A final, polished Markdown report saved to disk, which incorporates all analysis and visualizations. 
-    The output should confirm the absolute path of the saved report.
+    A final Markdown report saved to disk that logically integrates text analysis and generated visualizations.
+  output_path: >
+    ./results/{dataset_name}/{dataset_name}.md

@@ -1,5 +1,5 @@
-# Access Verify
-import os
+""" Class validating the user access """
+
 from src.registry import DATASET_REGISTRY, USER_PERMISSIONS
 
 class SecurityVerify:

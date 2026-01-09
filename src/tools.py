@@ -1,9 +1,11 @@
-# Custom Tools
-from crewai.tools import BaseTool
-import io
+"""Custom tools for agents based on BaseTool from crewai """
+
+import io,
 import os
 import yaml
 from contextlib import redirect_stdout
+
+from crewai.tools import BaseTool
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.join(current_dir, "plot_fig.yaml")
@@ -37,7 +39,6 @@ class PythonREPLTool(BaseTool):
             import seaborn as sns
             import statsmodels.api as sm
             from scipy import stats
-            # local_scope = {}
             local_scope = {
                 "pd": pd, 
                 "np": np, 
@@ -55,15 +56,11 @@ class PythonREPLTool(BaseTool):
             if not result:
                 result = "Execution completed."
             result = str(result)
-            # #exec_globals = { "matplotlib": matplotlib, "scipy": scipy, "pandas": pandas, "pd": pd, "np": np, "sns": sns, "plt": plt, "pearsonr":pearsonr} 
-            # # Execute the code
-            # exec(code, globals(), local_scope)  
-            # result = local_scope.get('result', 'Execution completed.')
-            # # Output truncated due to context limits
+
+            # Output truncated due to context limits
             if len(result) > 2000: 
                 return result[:2000] + "\n[Output truncated due to context limits...]"
             return result
-            # return str(local_scope.get('result', 'Execution completed.'))
         
         except Exception as e:
             return f"Error executing code: {str(e)}"
@@ -102,7 +99,6 @@ class StyleConfigTool(BaseTool):
         if plot_type in ['line', 'bar', 'scatter', 'heatmap']:
             basic = styles.get("plot_types", {}).get("basic")
             params = styles.get("plot_types", {}).get(plot_type, {})
-            
             
             return str({"basic": basic, "params": params})
         
