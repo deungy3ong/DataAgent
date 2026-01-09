@@ -27,11 +27,14 @@ DataAgent/
 ├── src/                     # Source code
 │   ├── agents.py            # Agent definitions (Analyst, Visualizer)
 │   ├── tasks.py             # Task definitions
-│   ├── tools.py        
+│   ├── tools.py             # Tools definitions
 │   ├── flow.py              # HITL Flow orchestration logic
+│   ├── registry.py          # Define the data access
+│   ├── security.py          # Class validating the user access
 │   └── main.py              # Application(CLI) entry point
 │   ├── agent_config.yaml    # Agent prompt
 │   └── task_config.yaml     # Task prompt
+│   ├── plot_config.yaml     # Plot function parameters configuration
 │
 ├── tests/                   # Unit tests
 │   └── test.py              # Logic verification tests
