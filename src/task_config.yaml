@@ -1,30 +1,36 @@
 analysis_task:
   description: >
-    1. Load and Preprocess the dataset at {dataset_path}. using Python"
-    2. Analyze the data based on user query: {user_query}.
-    3. OUTPUT REQUIREMENT: You must provide a structured output divided into two sections:
-      - SECTION A: Statistical Insights & Business Logic (metrics, correlations, outliers).
-      - SECTION B: Plotting Instructions (Suggest 2-3 key plots and provide the aggregated numbers for them).
+    1. Load the dataset at {dataset_path} and perform mandatory preprocessing (cleaning, type conversion).
+    2. Analyze the data based on the user query: "{user_query}".
+    3. **Memory Check:** If this is a revised run, review previous feedback and adjust the analysis focus accordingly.
+    4. OUTPUT REQUIREMENT: Provide a structured summary for the Manager containing:
+       - SECTION A: Key Statistical Insights (Logic, Metrics, KPIs).
+       - SECTION B: Plotting Data (Aggregated numbers and suggestions for 2-3 plots).
   expected_output: >
-    A concise and structured text summary with Section A (Stats) and Section B (Data for Plots), max 500 words.
+    A structured technical summary with Section A (Stats) and Section B (Plot Data), ready for the Manager to review and the Visualizer to use.
 
 visualization_task:
   description: >
-    1. Read the 'SECTION B: Plotting Instructions' from the Analyst's output.
-    2. Generate Python code to create these plots using Matplotlib/Seaborn.
-    3. Analyze the generated charts to identify visual trends (spikes, drops, patterns).
-    4. MANDATORILY save these generated plots under the folder {output_path} using plt.savefig() and DO NOT use plt.show()
+    1. Review 'SECTION B' from the Analyst's output to understand the data structure.
+    2. **Style Retrieval (Mandatory):** Identify the type of chart needed (e.g., 'line', 'bar'). 
+       **Call the `StyleConfigTool`** with this chart type to get the dictionary of styling parameters (palette, figure_size, spines, etc.).
+    3. **Code Generation:** Generate Python code to create the plots. 
+       **Constraint:** You must unpack/inject the parameters retrieved from Step 2 into your plotting functions (e.g., `sns.barplot(..., **retrieved_params)`). 
+       Do NOT hardcode colors unless explicitly overriding for a specific insight.
+    4. **Save Images:** Save plots strictly to `{result_path}/{dataset_name}/images/`.
+    5. **Memory Check:** If previous feedback mentioned style issues, ensure you are correctly applying the tool's output this time.
   expected_output: >
-    A structured list of the saved image files using relative paths,
-    formatted exactly like this: 'IMAGE_PATH: images/filename.png'.
-    Followed by a brief description of the trends in each plot.
+    A list of relative paths for the saved images (formatted: 'IMAGE_PATH: images/filename.png') 
+    where every image strictly adheres to the company style retrieved from the tool.
+    Accompanied by a short visual trend analysis for each plot.
 
 report_task:
   description: >
-    1. Review the Statistical Insights from the Analyst (Task 1).
-    2. Review the Image Paths and Visual Trends from the Visualizer (Task 2).
-    3. Synthesize these into a cohesive Markdown report.
-    4. Embed images using the relative paths provided.
-    5. Save the final file as {dataset_name}.md in the {output_path}.
+    1. Act as the final consolidator. Gather all "Statistical Insights" from the Analysis Task, the "Image Paths" from the Visualization Task and conversation history.
+    2. Synthesize a professional Data Analysis Report in Markdown format.
+    3. **Embed Images:** Use the relative paths provided (e.g., `![Trend](images/plot.png)`).
+    4. **User Alignment:** Ensure the tone and content directly answer: "{user_query}".
+    5. Save the final report file as `{dataset_name}.md` in `{result_path}/{dataset_name}/`.
   expected_output: >
-    A professional Markdown report saved to the disk, confirming the file path.
+    A final, polished Markdown report saved to disk, which incorporates all analysis and visualizations. 
+    The output should confirm the absolute path of the saved report.

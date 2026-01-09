@@ -13,19 +13,19 @@ config_path = os.path.join(current_dir, "agent_config.yaml")
 
 class Agents:
     def __init__(self, 
-                 dataset_name:str,
+                 dataset_cleanname:str,
                  api_key:str,
                  api_org: str,
                  model: str="gpt-4o",
                  temperature: int = 1.0,
                  config_path: str = config_path):
-        self.dataset_name = dataset_name
+        self.dataset_cleanname = dataset_cleanname
         
         # current_folder = Path(__file__).resolve().parent
         # root_path = current_folder.parent.parent
         
         # Create the folder to store results if not existing
-        self.result_path = root_path + "/results/" + Path(dataset_name).stem.split('.')[0]
+        self.result_path = root_path + "/results/" + Path(dataset_cleanname).stem.split('.')[0]
         os.makedirs(os.path.join(self.result_path, "images"), exist_ok=True)
         
         try:
@@ -33,7 +33,7 @@ class Agents:
                 content = file.read()
             self.config = yaml.safe_load(
                 content.replace("{result_path}", str(self.result_path)) \
-                    .replace("{dataset_name}", str(self.dataset_name))
+                    .replace("{dataset_name}", str(self.dataset_cleanname))
                     )
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Agent configuration file not found: {self.config_path}") from e
@@ -57,6 +57,7 @@ class Agents:
         goal = agent_config.get("goal")
         backstory = agent_config.get("backstory")
         allow_code_execution = agent_config.get("allow_code_execution")
+        allow_delegation = agent_config.get("allow_delegation")
         
         return Agent(
             role = role,
@@ -65,5 +66,6 @@ class Agents:
             llm = self.model,
             tools = tools,
             allow_code_execution = allow_code_execution,
-            verbose = True
+            verbose = True,
+            allow_delegation = allow_delegation
         )

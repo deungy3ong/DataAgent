@@ -54,8 +54,14 @@ if __name__ == "__main__":
     dataset_name="chinook.db"
     
     print("\n🚀 Starting Flow...")
-    query="Analysis the dataset and generate a report."
-    flow = DataAnalysisFlow(user, dataset_name, query)
+    query="Tell me how many tables in the dataset?"
+    is_allowed, dataset_path = SecurityVerify.verify_access(user, dataset_name)
+    flow = DataAnalysisFlow(user=user, 
+                            dataset_name=dataset_name, 
+                            dataset_path = dataset_path,
+                            query=query,
+                            api_key=api_key,
+                            api_org=api_org)
     flow.kickoff()
     print("\n★ Flow Finished ★")
 
