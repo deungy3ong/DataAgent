@@ -4,7 +4,7 @@
 
 DataAgent employs a team of specialized AI agents—an **Analyst** and a **Visualizer**—to answer complex user queries, generate production-grade charts, and synthesize professional Markdown reports.
 
-![Workflow](workflow.jpg "Workflow")
+![Workflow](workflow.png "Workflow")
 
 ## 🚀 Features
 
