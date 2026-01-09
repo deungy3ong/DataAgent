@@ -1,6 +1,6 @@
 """Custom tools for agents based on BaseTool from crewai """
 
-import io,
+import io
 import os
 import yaml
 from contextlib import redirect_stdout
